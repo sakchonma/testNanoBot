@@ -28,8 +28,11 @@ mongooseController.connect(async (err: any, result: any) => {
         const db = result.db
         const agenda = result.agenda;
         const connection = db.connection;
-        const agendaEnv = process.env.AGENDA || null
-        if (agendaEnv == "1") {
+        const agenda_env = process.env.AGENDA || null
+        const redis_env = process.env.REDIS_URL || null
+        const vercel_redis_env = process.env.VERCEL_REDIS_URL || null
+        const server_env = process.env.SERVER || null
+        if (agenda_env == "1") {
             const jobsCollection: Collection<Document> = connection.db.collection("jobs");
 
             const result = await jobsCollection.deleteMany({});
@@ -54,17 +57,18 @@ mongooseController.connect(async (err: any, result: any) => {
         })
 
         db.connection.on('disconnected', () => console.log("Server api disconnected from MongoDB !", "MONGODB"))
-        const redis_env = process.env.REDIS_URL || null
-        if (redis_env) {
-            const redis = new Redis(redis_env);
+        const connect_redis = server_env === "1" ? vercel_redis_env : redis_env
+        if (connect_redis) {
 
-            redis.set("test", "Radis Ready!");
+            const redis = new Redis(connect_redis);
+
+            redis.set("test", server_env === "1" ? "Radis vercel_redis_env Ready! " : "Radis redis_env Ready! ");
             redis.get("test").then(console.log);
         }
 
         app.use('/api', routes)
         app.listen(PORT, async () => {
-            if (agendaEnv == "1") {
+            if (agenda_env == "1") {
 
             }
             console.log("Server api is ready on!!")

@@ -31,7 +31,7 @@ export const fetchAndSaveExchangeDetails = async () => {
         }));
 
         const result = await exchangeDetail24hrModel.bulkWrite(bulkOps);
-        console.log(`[fetchAndSaveExchangeDetails] Saved ${bulkOps.length} docs`, result);
+        console.log(`[fetchAndSaveExchangeDetails] Saved ${bulkOps.length} docs`);
     } catch (error: any) {
         console.error("[fetchAndSaveExchangeDetails] error:", error.message || error);
     }

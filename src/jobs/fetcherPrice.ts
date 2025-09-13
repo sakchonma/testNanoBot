@@ -11,6 +11,6 @@ export default (Agenda: any) => {
         done()
     })
 
-    Agenda.every('0 * * * * *', 'FETCH_PRICE')
+    Agenda.every('*/20 * * * *', 'FETCH_PRICE')
     Agenda.start()
 }

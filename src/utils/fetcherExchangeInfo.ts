@@ -46,7 +46,7 @@ export const fetcherExchangeInfo = async () => {
         }));
 
         const result = await ExchangeInfosModel.bulkWrite(bulkOps);
-        console.log(`[fetcherExchangeInfo] Saved ${bulkOps.length} docs`, result);
+        console.log(`[fetcherExchangeInfo] Saved ${bulkOps.length} docs`);
     } catch (error: any) {
         console.error("[fetcherExchangeInfo] error:", error.message || error);
     }

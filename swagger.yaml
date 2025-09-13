@@ -1,0 +1,148 @@
+openapi: 3.0.0
+info:
+  title: nanobot
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8080'
+tags:
+  -
+    name: coins
+  -
+    name: user
+paths:
+  /api/coin/list:
+    get:
+      tags:
+        - coins
+      summary: listcoins
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json: {}
+      security:
+        -
+          BearerAuth: []
+  /api/user/register:
+    post:
+      tags:
+        - user
+      summary: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                username: user2
+                email: user2@hotmail.com
+                password: 12345678@User2
+                confirmPassword: 12345678@User2
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json: {}
+      security:
+        -
+          BearerAuth: []
+  /api/user/login:
+    post:
+      tags:
+        - user
+      summary: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: admin@hotmail.com
+                password: 12345678@Admin
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json: {}
+      security:
+        -
+          BearerAuth: []
+  /api/user/list:
+    post:
+      tags:
+        - user
+      summary: list
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                page: 1
+                limit: 0
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json: {}
+      security:
+        -
+          BearerAuth: []
+  /api/user/get/68c3d27908893d0f6a38656c:
+    get:
+      tags:
+        - user
+      summary: getUserById
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json: {}
+      security:
+        -
+          BearerAuth: []
+  /api/user/edit/68c3d28408893d0f6a38656f:
+    put:
+      tags:
+        - user
+      summary: editUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                username: admin
+                email: admin@hotmail.com
+                role: admin
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json: {}
+      security:
+        -
+          BearerAuth: []
+  /api/user/delete/68c3f3d5c4ea6502c5deb2bb:
+    delete:
+      tags:
+        - user
+      summary: deleteUser
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json: {}
+      security:
+        -
+          BearerAuth: []
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  -
+    BearerAuth: []

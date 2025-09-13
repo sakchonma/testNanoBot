@@ -1,0 +1,204 @@
+{
+	"info": {
+		"_postman_id": "573216ae-c2fa-4237-96c8-b60b107cfc69",
+		"name": "nanobot",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "20973730"
+	},
+	"item": [
+		{
+			"name": "coins",
+			"item": [
+				{
+					"name": "listcoins",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YzNkMjg0MDg4OTNkMGY2YTM4NjU2ZiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzY5MDgzMCwiZXhwIjoxNzYwMjgyODMwfQ.kD9RtAA-kVCc3b1u_FnmJIH-U55Eni329ACIB30V6QA"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/coin/list"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "register",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if(responseCode.code === 200){\r",
+									"    const jsonData = pm.response.json()\r",
+									"    postman.setEnvironmentVariable(\"token\", jsonData.data.jwtToken);\r",
+									"   \r",
+									"} else if(responseCode.code === 400){\r",
+									"    const data = JSON.parse(responseBody)\r",
+									"    tests[\"Status code is 400\"] = responseCode.code === 400\r",
+									"} else {\r",
+									"    tests[\"Status code is 401 Unauthorized\"] = responseCode.code === 401\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"user2\",\r\n    \"email\":\"user2@hotmail.com\",\r\n    \"password\":\"12345678@User2\",\r\n    \"confirmPassword\":\"12345678@User2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/user/register"
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if(responseCode.code === 200){\r",
+									"    const jsonData = pm.response.json()\r",
+									"    postman.setEnvironmentVariable(\"token\", jsonData.data.jwtToken);\r",
+									"   \r",
+									"} else if(responseCode.code === 400){\r",
+									"    const data = JSON.parse(responseBody)\r",
+									"    tests[\"Status code is 400\"] = responseCode.code === 400\r",
+									"} else {\r",
+									"    tests[\"Status code is 401 Unauthorized\"] = responseCode.code === 401\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"admin@hotmail.com\",\r\n    \"password\":\"12345678@Admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/user/login"
+					},
+					"response": []
+				},
+				{
+					"name": "list",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YzNkMjg0MDg4OTNkMGY2YTM4NjU2ZiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzY5MDgzMCwiZXhwIjoxNzYwMjgyODMwfQ.kD9RtAA-kVCc3b1u_FnmJIH-U55Eni329ACIB30V6QA"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"page\":1,\r\n    \"limit\":0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/user/list"
+					},
+					"response": []
+				},
+				{
+					"name": "getUserById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YzNkMjg0MDg4OTNkMGY2YTM4NjU2ZiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzY5MDgzMCwiZXhwIjoxNzYwMjgyODMwfQ.kD9RtAA-kVCc3b1u_FnmJIH-U55Eni329ACIB30V6QA"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/user/get/68c3d27908893d0f6a38656c"
+					},
+					"response": []
+				},
+				{
+					"name": "editUser",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YzNkMjg0MDg4OTNkMGY2YTM4NjU2ZiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzY5MDgzMCwiZXhwIjoxNzYwMjgyODMwfQ.kD9RtAA-kVCc3b1u_FnmJIH-U55Eni329ACIB30V6QA"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"admin\",\r\n    \"email\":\"admin@hotmail.com\",\r\n    \"role\":\"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/user/edit/68c3d28408893d0f6a38656f"
+					},
+					"response": []
+				},
+				{
+					"name": "deleteUser",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YzNkMjg0MDg4OTNkMGY2YTM4NjU2ZiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzY5MDgzMCwiZXhwIjoxNzYwMjgyODMwfQ.kD9RtAA-kVCc3b1u_FnmJIH-U55Eni329ACIB30V6QA"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "http://localhost:8080/api/user/delete/68c3f3d5c4ea6502c5deb2bb"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -11,6 +11,6 @@ export default (Agenda: any) => {
         done()
     })
 
-    Agenda.every('40 * * * * *', 'FETCH_EXCHANGE_24HR')
+    Agenda.every('* * * * *', 'FETCH_EXCHANGE_24HR')
     Agenda.start()
 }

@@ -22,7 +22,7 @@ export const fetchPrice = async () => {
         }));
 
         const result = await CoinsModel.bulkWrite(bulkOps);
-        console.log(`[fetchPrice] Saved ${bulkOps.length} docs`, result);
+        console.log(`[fetchPrice] Saved ${bulkOps.length} docs`);
     } catch (error: any) {
         console.error("[fetchPrice] error:", error.message || error);
     }

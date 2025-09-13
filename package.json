@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node dist/app.js",
-    "build": "tsc -p",
+    "build": "tsc",
     "start:dev": "tsc -p . && nodemon dist/app.js",
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
   },

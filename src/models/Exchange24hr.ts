@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 const { Schema } = mongoose
 
-const exchangeDetail24hrSchema = new Schema({
+const Exchange24hrSchema = new Schema({
   symbol: {
     type: String
   },
@@ -51,5 +51,5 @@ const exchangeDetail24hrSchema = new Schema({
   },
 })
 
-const ExchangeDetail24hr = mongoose.model('ExchangeDetail24hr', exchangeDetail24hrSchema)
-export default ExchangeDetail24hr
+const Exchange24hr = mongoose.model('Exchange24hr', Exchange24hrSchema)
+export default Exchange24hr

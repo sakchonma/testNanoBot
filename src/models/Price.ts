@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 const { Schema } = mongoose
 
-const CoinSchema = new Schema({
+const PriceSchema = new Schema({
     symbol: {
         type: String,
         default: null
@@ -16,5 +16,5 @@ const CoinSchema = new Schema({
     },
 })
 
-const Coin = mongoose.model('Coin', CoinSchema)
-export default Coin
+const Price = mongoose.model('Price', PriceSchema)
+export default Price

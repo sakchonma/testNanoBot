@@ -4,12 +4,14 @@ import {
     Response
 } from "express"
 import {
-    listCoinsService as listCoins,
+    listExchangeService as listExchange,
+    getInfoExchangeService as getInfoExchange,
+    getAllPriceService as getAllPrice,
 } from "../services/coin"
 import validateRequest from "../middleware/validateRequest"
 import Joi from "joi"
 
-const listCoinsSchema = (
+const listExchangeSchema = (
     req: Request,
     res: Response,
     next: NextFunction
@@ -28,7 +30,7 @@ const listCoinsSchema = (
 
     validateRequest(req, res, next, schema)
 }
-const listCoinsController = async (
+const listExchangeController = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -37,7 +39,68 @@ const listCoinsController = async (
         page,
         limit,
     } = req.body
-    listCoins(page, limit).then((result) => {
+    listExchange(page, limit).then((result) => {
+        if (result) {
+            return res
+                .status(200)
+                .json({
+                    status: true,
+                    ...result,
+                })
+        } else {
+            return res
+                .status(200)
+                .json({
+                    status: false,
+                    message: "try again"
+                })
+        }
+    })
+        .catch((error: any) => {
+            return res.status(200)
+                .json({
+                    status: false,
+                    message: error
+                })
+        })
+}
+const getInfoExchangeController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const symbol = req.params.symbol
+    getInfoExchange(symbol).then((result) => {
+        if (result) {
+            return res
+                .status(200)
+                .json({
+                    status: true,
+                    ...result,
+                })
+        } else {
+            return res
+                .status(200)
+                .json({
+                    status: false,
+                    message: "try again"
+                })
+        }
+    })
+        .catch((error: any) => {
+            return res.status(200)
+                .json({
+                    status: false,
+                    message: error
+                })
+        })
+}
+const getAllPriceController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    getAllPrice().then((result) => {
         if (result) {
             return res
                 .status(200)
@@ -63,7 +126,10 @@ const listCoinsController = async (
         })
 }
 
+
 export {
-    listCoinsSchema,
-    listCoinsController,
+    listExchangeSchema,
+    listExchangeController,
+    getInfoExchangeController,
+    getAllPriceController
 }

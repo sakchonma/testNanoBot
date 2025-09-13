@@ -1,5 +1,5 @@
 import axios from 'axios';
-import CoinsModel from '../models/Coin';
+import PriceModel from '../models/Price';
 
 export const fetchPrice = async () => {
     try {
@@ -21,7 +21,7 @@ export const fetchPrice = async () => {
             }
         }));
 
-        const result = await CoinsModel.bulkWrite(bulkOps);
+        const result = await PriceModel.bulkWrite(bulkOps);
         console.log(`[fetchPrice] Saved ${bulkOps.length} docs`);
     } catch (error: any) {
         console.error("[fetchPrice] error:", error.message || error);

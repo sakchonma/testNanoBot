@@ -1,9 +1,10 @@
 import { getRedisClient } from '../configs/redis';
 import ExchangeInfoModel from '../models/ExchangeInfo';
-
+import Exchange24hrModel from '../models/Exchange24hr';
+import PriceModel from '../models/Price';
 const INTERVAL_MS = Number(process.env.FETCH_INTERVAL_MS || 60000);
 
-const listCoinsService = async (page: number, limit: number) => {
+const listExchangeService = async (page: number, limit: number) => {
     try {
 
         const pageNumber = Number(page);
@@ -17,7 +18,13 @@ const listCoinsService = async (page: number, limit: number) => {
             console.log(`use redis key: price-coins-${page}-${limit}`);
             return { data: JSON.parse(cachedData) };
         }
-        const listCoins: any = await ExchangeInfoModel.find()
+        const listCoins: any = await ExchangeInfoModel.find().select({
+            symbol: 1,
+            baseAsset: 1,
+            quoteAsset: 1,
+            status: 1,
+            quoteOrderQtyMarketAllowed: 1,
+        })
             .skip(skip)
             .limit(limitNumber)
             .sort({ createdAt: -1 });
@@ -57,16 +64,52 @@ const getInfoExchangeService = async (symbol: string) => {
         }
 
         const infoExchange: any = await ExchangeInfoModel.findOne({ symbol: symbol })
-
+        const detail24hr: any = await Exchange24hrModel.findOne({ symbol: symbol })
         await redis.set(
             cacheKey,
-            JSON.stringify({ data: infoExchange }),
+            JSON.stringify({
+                data: {
+                    info: infoExchange,
+                    detail24hr: detail24hr
+                }
+            }),
             'EX',
             Math.floor(INTERVAL_MS / 1000) - 5 || 55
         );
 
         return {
-            data: infoExchange,
+            data: {
+                info: infoExchange,
+                detail24hr: detail24hr
+            },
+        };
+    } catch (error: any) {
+        throw error.message ? error.message : error;
+    }
+};
+
+const getAllPriceService = async () => {
+    try {
+
+        const redis = await getRedisClient();
+        const cacheKey = `all-price`;
+        const cachedData = await redis.get(cacheKey);
+        if (cachedData) {
+            console.log(`use redis key: all-price`);
+            return { data: JSON.parse(cachedData) };
+        }
+
+        const allPrice: any = await PriceModel.find()
+
+        await redis.set(
+            cacheKey,
+            JSON.stringify({ data: allPrice }),
+            'EX',
+            Math.floor(INTERVAL_MS / 1000) - 5 || 55
+        );
+
+        return {
+            data: allPrice,
         };
     } catch (error: any) {
         throw error.message ? error.message : error;
@@ -74,6 +117,7 @@ const getInfoExchangeService = async (symbol: string) => {
 };
 
 export {
-    listCoinsService,
+    listExchangeService,
     getInfoExchangeService,
+    getAllPriceService
 };

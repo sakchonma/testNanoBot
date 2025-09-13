@@ -8,7 +8,6 @@ export const getRedisClient = (): Redis => {
         if (!redis_env) {
             throw new Error('Redis URL is not defined');
         }
-        console.log(redis_env)
         redisClient = new Redis(redis_env);
         redisClient.on('connect', () => console.log('Redis Ready!'));
         redisClient.on('error', (err) => console.error('Redis error:', err));

@@ -1,6 +1,6 @@
 import axios from "axios"
 
-import exchangeDetail24hrModel from "../models/ExchangeDetail24hr"
+import exchange24hrModel from "../models/Exchange24hr"
 
 export const fetchAndSaveExchangeDetails = async () => {
     try {
@@ -30,7 +30,7 @@ export const fetchAndSaveExchangeDetails = async () => {
             }
         }));
 
-        const result = await exchangeDetail24hrModel.bulkWrite(bulkOps);
+        const result = await exchange24hrModel.bulkWrite(bulkOps);
         console.log(`[fetchAndSaveExchangeDetails] Saved ${bulkOps.length} docs`);
     } catch (error: any) {
         console.error("[fetchAndSaveExchangeDetails] error:", error.message || error);

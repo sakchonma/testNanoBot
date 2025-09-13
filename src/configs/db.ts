@@ -17,7 +17,7 @@ class MongooseController {
       if (agendaEnv == "1") {
         this.agendaController.connect((err: any, agenda: any) => {
           if (err) return cb(err)
-
+          console.log('Mongoose Ready!')
           return cb(null, {
             db: this.db,
             agenda: agenda

@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "tsc -p .",
     "start": "node dist/app.js",
+    "build": "tsc -p",
     "start:dev": "tsc -p . && nodemon dist/app.js",
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
   },
@@ -28,6 +28,7 @@
     "morgan": "^1.10.1",
     "postman-collection": "^5.1.1",
     "postman-to-openapi": "^1.7.3",
+    "redis": "^5.8.2",
     "serverless-http": "^4.0.0",
     "socket.io": "^4.7.1",
     "swagger-ui-express": "^5.0.1",

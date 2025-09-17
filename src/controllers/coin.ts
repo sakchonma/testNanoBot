@@ -8,6 +8,7 @@ import {
     getInfoExchangeService as getInfoExchange,
     getAllPriceService as getAllPrice,
     getAllKeyRedis as getAllKeyRedis,
+    listPriceService as listPrice,
 } from "../services/coin"
 import validateRequest from "../middleware/validateRequest"
 import Joi from "joi"
@@ -126,7 +127,6 @@ const getAllPriceController = async (
                 })
         })
 }
-
 const getAllKeyRedisController = async (
     req: Request,
     res: Response,
@@ -157,10 +157,65 @@ const getAllKeyRedisController = async (
                 })
         })
 }
+const listPriceSchema = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const schema = Joi.object({
+        page: Joi.number()
+            .integer()
+            .min(1)
+            .required(),
+        limit: Joi.number()
+            .integer()
+            .min(1)
+            .max(100)
+            .required(),
+    })
+
+    validateRequest(req, res, next, schema)
+}
+const listPriceController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const {
+        page,
+        limit,
+    } = req.body
+    listPrice(page, limit).then((result) => {
+        if (result) {
+            return res
+                .status(200)
+                .json({
+                    status: true,
+                    ...result,
+                })
+        } else {
+            return res
+                .status(200)
+                .json({
+                    status: false,
+                    message: "try again"
+                })
+        }
+    })
+        .catch((error: any) => {
+            return res.status(200)
+                .json({
+                    status: false,
+                    message: error
+                })
+        })
+}
 export {
     listExchangeSchema,
     listExchangeController,
     getInfoExchangeController,
     getAllPriceController,
-    getAllKeyRedisController
+    getAllKeyRedisController,
+    listPriceSchema,
+    listPriceController
 }

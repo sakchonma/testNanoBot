@@ -1,18 +1,23 @@
 import { Server, Socket } from "socket.io";
 import { getRedisClient } from "../configs/redis";
 import { fetchKline } from "../utils/binanceKline";
+
 const timers: any = new Map();
-export default (
-    io: Server,
-    socket: Socket
-) => {
+const subscribers: any = new Map();
+
+export default (io: Server, socket: Socket) => {
     const onGetSymbol = async (
-        data: { symbol: string, interval: string },
+        data: { symbol: string; interval: string },
         callback?: (response: string, error: string) => void
     ) => {
         try {
             const redis = await getRedisClient();
             const cacheKey = `kline:${data.symbol}:${data.interval}`;
+
+            if (!subscribers.has(cacheKey)) {
+                subscribers.set(cacheKey, new Set());
+            }
+            subscribers.get(cacheKey)!.add(socket.id);
 
             socket.join(cacheKey);
 
@@ -22,7 +27,7 @@ export default (
                 await fetchKline(data.symbol, data.interval);
 
                 const timer = setInterval(async () => {
-                    console.log(`Refreshing ${cacheKey} from Binance...`);
+                    console.log(`Refreshing ${cacheKey} from Binance`);
                     await fetchKline(data.symbol, data.interval);
 
                     const cached = await redis.get(cacheKey);
@@ -34,7 +39,6 @@ export default (
                 timers.set(cacheKey, timer);
             }
 
-            // ✅ ส่งข้อมูลล่าสุดจาก redis กลับไปหา client ทันที
             const cached = await redis.get(cacheKey);
             if (cached) {
                 socket.emit("klineUpdate", JSON.parse(cached));
@@ -45,6 +49,24 @@ export default (
             callback && callback("null", err ? err.toString() : "error");
         }
     };
+
+    socket.on("disconnect", () => {
+        console.log(`Socket disconnected: ${socket.id}`);
+
+        for (const [cacheKey, subs] of subscribers.entries()) {
+            if (subs.has(socket.id)) {
+                subs.delete(socket.id);
+                console.log(`Removed ${socket.id} from ${cacheKey}`);
+            }
+
+            if (subs.size === 0) {
+                console.log(`Stop timer for ${cacheKey}`);
+                clearInterval(timers.get(cacheKey));
+                timers.delete(cacheKey);
+                subscribers.delete(cacheKey);
+            }
+        }
+    });
 
     socket.on("subscribeKline", onGetSymbol);
 };

@@ -5,6 +5,8 @@ info:
 servers:
   -
     url: 'https://nanobot-mjgu.onrender.com'
+  -
+    url: 'localhost://'
 tags:
   -
     name: coins
@@ -16,6 +18,27 @@ paths:
       tags:
         - coins
       summary: listcoins
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                page: 1
+                limit: 10
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json: {}
+      security:
+        -
+          BearerAuth: []
+  /api/coin/listprice:
+    post:
+      tags:
+        - coins
+      summary: listPrice
       requestBody:
         content:
           application/json:
@@ -50,6 +73,19 @@ paths:
       tags:
         - coins
       summary: allprice
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json: {}
+      security:
+        -
+          BearerAuth: []
+  /000/api/coin/allredis:
+    get:
+      tags:
+        - coins
+      summary: allredis
       responses:
         '200':
           description: 'Successful response'

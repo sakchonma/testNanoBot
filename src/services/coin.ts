@@ -12,10 +12,10 @@ const listExchangeService = async (page: number, limit: number) => {
         const skip = (pageNumber - 1) * limitNumber;
         const redis = await getRedisClient();
 
-        const cacheKey = `price-coins-${page}-${limit}`;
+        const cacheKey = `price-detail-${page}-${limit}`;
         const cachedData = await redis.get(cacheKey);
         if (cachedData) {
-            console.log(`use redis key: price-coins-${page}-${limit}`);
+            console.log(`use redis key: price-detail-${page}-${limit}`);
             return { data: JSON.parse(cachedData) };
         }
         const listCoins: any = await ExchangeInfoModel.find().select({
@@ -39,13 +39,13 @@ const listExchangeService = async (page: number, limit: number) => {
         );
 
         return {
-            data: listCoins,
             pagination: {
                 total: total,
                 page: pageNumber,
                 limit: limitNumber,
                 totalPages,
-            }
+            },
+            data: listCoins,
         };
     } catch (error: any) {
         throw error.message ? error.message : error;
@@ -87,7 +87,46 @@ const getInfoExchangeService = async (symbol: string) => {
         throw error.message ? error.message : error;
     }
 };
+const listPriceService = async (page: number, limit: number) => {
+    try {
 
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+        const skip = (pageNumber - 1) * limitNumber;
+        const redis = await getRedisClient();
+        const cacheKey = `price-coins-${page}-${limit}`;
+        const cachedData = await redis.get(cacheKey);
+        if (cachedData) {
+            console.log(`use redis key: price-coins-${page}-${limit}`);
+            return { data: JSON.parse(cachedData) };
+        }
+        const listPrice: any = await PriceModel.find()
+            .skip(skip)
+            .limit(limitNumber)
+            .sort({ createdAt: -1 });
+        const total = await PriceModel.countDocuments();
+        const totalPages = limitNumber > 0 ? Math.ceil(total / limitNumber) : 1;
+
+        await redis.set(
+            cacheKey,
+            JSON.stringify({ data: listPrice, total, page, limit }),
+            'EX',
+            Math.floor(INTERVAL_MS / 1000) - 5 || 55
+        );
+
+        return {
+            pagination: {
+                total: total,
+                page: pageNumber,
+                limit: limitNumber,
+                totalPages,
+            },
+            data: listPrice,
+        };
+    } catch (error: any) {
+        throw error.message ? error.message : error;
+    }
+};
 const getAllPriceService = async () => {
     try {
 
@@ -115,7 +154,6 @@ const getAllPriceService = async () => {
         throw error.message ? error.message : error;
     }
 };
-
 const getAllKeyRedis = async () => {
     try {
 
@@ -154,6 +192,7 @@ const getAllKeyRedis = async () => {
 export {
     listExchangeService,
     getInfoExchangeService,
+    listPriceService,
     getAllPriceService,
     getAllKeyRedis
 };

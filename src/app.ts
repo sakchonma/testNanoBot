@@ -4,13 +4,11 @@ import dotenv from 'dotenv'
 import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import express from 'express'
-
 import swaggerUi from 'swagger-ui-express'
 import YAML from 'yamljs'
 import fs from "fs";
 import path from "path";
 import { Collection, Document } from "mongodb";
-
 import { getRedisClient } from './configs/redis';
 import { EventEmitter } from 'events';
 import { IPoolType } from "./types/jobs"
@@ -19,6 +17,7 @@ import MongooseController from './configs/db'
 import fetcherPrice from './jobs/fetcherPrice'
 import fetcherExchangeInfo from './jobs/fetcherExchangeInfo'
 import fetcherExchageDetail24hr from './jobs/fetcherExchageDetail24hr'
+import SocketIOController from "./sockets/socketIO";
 // @ts-ignore
 import postmanToOpenApi = require('postman-to-openapi');
 
@@ -102,9 +101,10 @@ mongooseController.connect(async (err: any, result: any) => {
 
         const swaggerDocument = YAML.load('./swagger.yaml')
         app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
-
         app.use('/api', routes)
-        app.listen(PORT, async () => {
+
+
+        const server = app.listen(PORT, async () => {
             if (agenda_env == "1") {
                 fetcherExchageDetail24hr(agenda)
                 fetcherPrice(agenda)
@@ -112,6 +112,8 @@ mongooseController.connect(async (err: any, result: any) => {
             }
             console.log("Server api is ready on!!")
         })
+        new SocketIOController(server);
+
 
     } catch (error) {
         console.log(error)

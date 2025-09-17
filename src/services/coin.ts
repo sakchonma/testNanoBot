@@ -116,8 +116,44 @@ const getAllPriceService = async () => {
     }
 };
 
+const getAllKeyRedis = async () => {
+    try {
+
+        let cursor = "0";
+        const keys: string[] = [];
+        const redis = await getRedisClient();
+        do {
+            const result = await redis.scan(cursor, "MATCH", "*", "COUNT", 100);
+            cursor = result[0];
+            keys.push(...result[1]);
+        } while (cursor !== "0");
+        let cursorValue = "0";
+        const data: Record<string, string | null> = {};
+
+        do {
+            const result = await redis.scan(cursorValue, "MATCH", "*", "COUNT", 100);
+            cursorValue = result[0];
+
+            for (const key of result[1]) {
+                const value = await redis.get(key);
+                data[key] = value;
+            }
+        } while (cursorValue !== "0");
+        console.log("All keys:", keys);
+        console.log("All key-value:", data);
+
+        return {
+            AllKeys: keys,
+            AllKeyValue: data
+        }
+    } catch (error: any) {
+        throw error.message ? error.message : error;
+    }
+};
+
 export {
     listExchangeService,
     getInfoExchangeService,
-    getAllPriceService
+    getAllPriceService,
+    getAllKeyRedis
 };

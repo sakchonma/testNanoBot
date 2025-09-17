@@ -7,6 +7,7 @@ import {
     listExchangeService as listExchange,
     getInfoExchangeService as getInfoExchange,
     getAllPriceService as getAllPrice,
+    getAllKeyRedis as getAllKeyRedis,
 } from "../services/coin"
 import validateRequest from "../middleware/validateRequest"
 import Joi from "joi"
@@ -126,10 +127,40 @@ const getAllPriceController = async (
         })
 }
 
-
+const getAllKeyRedisController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    getAllKeyRedis().then((result) => {
+        if (result) {
+            return res
+                .status(200)
+                .json({
+                    status: true,
+                    ...result,
+                })
+        } else {
+            return res
+                .status(200)
+                .json({
+                    status: false,
+                    message: "try again"
+                })
+        }
+    })
+        .catch((error: any) => {
+            return res.status(200)
+                .json({
+                    status: false,
+                    message: error
+                })
+        })
+}
 export {
     listExchangeSchema,
     listExchangeController,
     getInfoExchangeController,
-    getAllPriceController
+    getAllPriceController,
+    getAllKeyRedisController
 }

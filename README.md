@@ -21,5 +21,5 @@ message body:
 socket on:"subscribeKline"
 
 emit event: 
-	klineUpdate
+	klineUpdate,
 	onlineCount

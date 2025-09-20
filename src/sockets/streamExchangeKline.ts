@@ -1,7 +1,7 @@
 import WebSocket from "ws";
 import { getRedisClient } from "../configs/redis";
 import KlineModel from "../models/Kline"; // mongoose schema
-
+const INTERVAL_MS = Number(process.env.SOCKET_INTERVAL_MS || 60000);
 export async function startKlineStream(symbol: string, interval = "1m") {
     const streamName = `${symbol.toLowerCase()}@kline_${interval}`;
     const wsUrl = `wss://stream.binance.com:9443/stream?streams=${streamName}`;
@@ -32,7 +32,7 @@ export async function startKlineStream(symbol: string, interval = "1m") {
 
             const cacheKey = `kline:${data.data.s}:${k.i}`;
 
-            await redis.set(cacheKey, JSON.stringify(klineData), "EX", 120);
+            await redis.set(cacheKey, JSON.stringify(klineData), "EX", Math.floor(INTERVAL_MS / 1000) - 5 || 55);
             console.log("📊 Kline Update:", streamName);
 
             if (k.x) {

@@ -17,6 +17,7 @@ import MongooseController from './configs/db'
 import fetcherPrice from './jobs/fetcherPrice'
 import fetcherExchangeInfo from './jobs/fetcherExchangeInfo'
 import fetcherExchageDetail24hr from './jobs/fetcherExchageDetail24hr'
+import { startKlineStream } from './sockets/streamExchangeKline'
 import SocketIOController from "./sockets/socketIO";
 // @ts-ignore
 import postmanToOpenApi = require('postman-to-openapi');
@@ -106,9 +107,10 @@ mongooseController.connect(async (err: any, result: any) => {
 
         const server = app.listen(PORT, async () => {
             if (agenda_env == "1") {
-                fetcherExchageDetail24hr(agenda)
-                fetcherPrice(agenda)
-                fetcherExchangeInfo(agenda)
+                // fetcherExchageDetail24hr(agenda)
+                // fetcherPrice(agenda)
+                // fetcherExchangeInfo(agenda)
+                // startKlineStream("btcusdt", '1m')
             }
             console.log("Server api is ready on!!")
         })

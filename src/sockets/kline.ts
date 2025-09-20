@@ -1,11 +1,11 @@
-import { Server, Socket } from "socket.io";
+import { Namespace, Socket } from "socket.io";
 import { getRedisClient } from "../configs/redis";
-import { fetchKline } from "../utils/binanceKline";
+import { startKlineStream } from "../sockets/streamExchangeKline";
 
 const timers: any = new Map();
 const subscribers: any = new Map();
-
-export default (io: Server, socket: Socket) => {
+const streamMap: any = new Map();
+export default (io: Namespace, socket: Socket) => {
     const onGetSymbol = async (
         data: { symbol: string; interval: string },
         callback?: (response: string, error: string) => void
@@ -24,12 +24,15 @@ export default (io: Server, socket: Socket) => {
             if (!timers.has(cacheKey)) {
                 console.log(`Start timer for ${cacheKey}`);
 
-                await fetchKline(data.symbol, data.interval);
+
+                if (!streamMap.has(cacheKey)) {
+                    console.log(`Start Binance stream for ${cacheKey}`);
+                    const ws = await startKlineStream(data.symbol, data.interval);
+                    streamMap.set(cacheKey, ws);
+                }
 
                 const timer = setInterval(async () => {
                     console.log(`Refreshing ${cacheKey} from Binance`);
-                    await fetchKline(data.symbol, data.interval);
-
                     const cached = await redis.get(cacheKey);
                     if (cached) {
                         io.to(cacheKey).emit("klineUpdate", JSON.parse(cached));
@@ -62,6 +65,13 @@ export default (io: Server, socket: Socket) => {
             if (subs.size === 0) {
                 console.log(`Stop timer for ${cacheKey}`);
                 clearInterval(timers.get(cacheKey));
+
+                const ws = streamMap.get(cacheKey);
+                if (ws) {
+                    ws.close();
+                    streamMap.delete(cacheKey);
+                }
+                subscribers.delete(cacheKey);
                 timers.delete(cacheKey);
                 subscribers.delete(cacheKey);
             }

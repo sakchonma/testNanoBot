@@ -20,20 +20,20 @@ export default (io: Namespace, socket: Socket) => {
             subscribers.get(cacheKey)!.add(socket.id);
 
             socket.join(cacheKey);
+            if (!streamMap.has(cacheKey)) {
+                console.log(`Start Binance stream for ${cacheKey}`);
+                const ws = await startKlineStream(data.symbol, data.interval);
+                socket.emit("klineUpdate", { "massage": "waiting for socket ..." });
+                streamMap.set(cacheKey, ws);
+            }
 
             if (!timers.has(cacheKey)) {
+
                 console.log(`Start timer for ${cacheKey}`);
-
-
-                if (!streamMap.has(cacheKey)) {
-                    console.log(`Start Binance stream for ${cacheKey}`);
-                    const ws = await startKlineStream(data.symbol, data.interval);
-                    streamMap.set(cacheKey, ws);
-                }
-
                 const timer = setInterval(async () => {
                     console.log(`Refreshing ${cacheKey} from Binance`);
                     const cached = await redis.get(cacheKey);
+                    console.log("cached:", cached)
                     if (cached) {
                         io.to(cacheKey).emit("klineUpdate", JSON.parse(cached));
                     }
@@ -41,11 +41,11 @@ export default (io: Namespace, socket: Socket) => {
 
                 timers.set(cacheKey, timer);
             }
-
             const cached = await redis.get(cacheKey);
             if (cached) {
                 socket.emit("klineUpdate", JSON.parse(cached));
             }
+
 
             callback && callback("Subscribe success", "null");
         } catch (err) {
